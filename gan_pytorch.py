@@ -9,6 +9,10 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.autograd import Variable
 
+import matplotlib.pyplot as plt
+
+import matplotlib.mlab as mlab
+
 # Data params
 data_mean = 4
 data_stddev = 1.25
@@ -128,3 +132,27 @@ for epoch in range(num_epochs):
                                                             extract(g_error)[0],
                                                             stats(extract(d_real_data)),
                                                             stats(extract(d_fake_data))))
+        
+        objects = ('D Real error', 'D Fake error', 'G error')
+        y_pos = np.arange(len(objects))
+        x_errors = [ extract(d_real_error)[0], extract(d_fake_error)[0], extract(g_error)[0] ]
+        
+        plt.bar(y_pos, x_errors, align ='center', alpha=0.5)
+        plt.xticks(y_pos, objects)
+        plt.ylabel('Errors')
+        plt.title('D Real vs. fake error and G error')
+        
+#        plt.show()
+        
+        mu_real = stats(extract(d_real_data))[0]
+        sigma_real = stats(extract(d_real_data))[1]
+
+        mu_fake = stats(extract(d_fake_data))[0]
+        sigma_fake = stats(extract(d_fake_data))[1]
+        
+        x_real = np.linspace(mu_real - 3*sigma_real, mu_real + 3*sigma_real, 100)
+        x_fake = np.linspace(mu_fake - 3*sigma_fake, mu_fake + 3*sigma_fake, 100)
+        
+        plt.plot(x_real,mlab.normpdf(x_real, mu_real, sigma_real))
+        plt.plot(x_fake,mlab.normpdf(x_fake, mu_fake, sigma_fake))
+        plt.show()
